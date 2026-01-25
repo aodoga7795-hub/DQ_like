@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class NPCInteract : MonoBehaviour, IInteractable
 {
@@ -8,9 +9,17 @@ public class NPCInteract : MonoBehaviour, IInteractable
     [TextArea]
     public string TalkMessage = "‚±‚ñ‚É‚¿‚Í";
 
+    /// <summary>
+    /// UnityEvent‚Íˆ—‚ğUnityEditor‚©‚çİ’è‚Å‚«‚Ü‚·
+    /// </summary>
+    public UnityEvent NPCEvent;
+
     public void Interact()
     {
         Debug.Log($"[NPC] {TalkMessage} „‚Í{NPCName}‚Å‚·");
+        //NPCEvent‚ªİ’è‚³‚ê‚Ä‚¢‚ê‚ÎiNull‚¶‚á‚È‚©‚Á‚½‚çj
+        //İ’è‚³‚ê‚½ˆ—‚ğ”­“®‚·‚é
+        NPCEvent?.Invoke();
     }
 
     
