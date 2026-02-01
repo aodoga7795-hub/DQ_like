@@ -45,6 +45,12 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //ダイアログがOpenしてたら何もしない
+        if (GameState.IsDialogOpen)
+        {
+            return;
+        }
+
         Move();
         ApplyGravity();
     }

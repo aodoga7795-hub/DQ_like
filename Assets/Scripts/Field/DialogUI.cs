@@ -1,0 +1,197 @@
+using UnityEngine;
+using TMPro;
+using System.Collections;
+
+public class DialogUI : MonoBehaviour
+{
+    /// <summary>
+    /// どこからでもアクセスできるようにStaticで宣言する
+    /// </summary>
+    public static DialogUI Instance;
+
+    public GameObject Panel;
+
+    public TextMeshProUGUI NameText;
+
+    public TextMeshProUGUI MessageText;
+
+    [Header("▼などのNextHint (optional)")]
+    public GameObject NextHint;
+
+    /// <summary>
+    /// １文字を待つ時間
+    /// </summary>
+    private float charInterval= 0.2f;
+
+    /// <summary>
+    /// メッセージの現在の行
+    /// </summary>
+    private string[] currentLines;
+
+    /// <summary>
+    /// 何行目か
+    /// </summary>
+    private int lineIndex;
+
+    private Coroutine typingCoroutine;
+
+    /// <summary>
+    /// 文字送り中かどうか
+    /// </summary>
+    private bool isTyping = false;
+
+
+
+    private void Awake()
+    {
+        Instance = this;
+        //ゲーム開始時はダイアログは表示しない
+        Panel.SetActive(false);
+
+        if(NextHint != null)
+        {
+            NextHint.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// 外部からダイアログの設定をして見せる
+    /// </summary>
+    /// <param name="name">名前</param>
+    /// <param name="message">本文</param>
+    public void Show(DialogData dialogData)
+    {
+        //DialogDataのデータが正常に動かない場合
+        if(dialogData ==null || dialogData.MessageLines ==null
+            || dialogData.MessageLines.Length == 0)
+        {
+            Debug.LogWarning("DialogDataが不正です");
+            return;
+        }
+
+
+        GameState.IsDialogOpen = true;
+        NameText.text = dialogData.Speaker;
+
+        currentLines = dialogData.MessageLines;
+        lineIndex = 0;
+
+        Panel.SetActive(true);
+        //現在の行を表示していく
+        ShowLine(lineIndex);
+    }
+
+    /// <summary>
+    /// UIのCloseボタンから呼びます
+    /// </summary>
+   public void Close()
+    {
+        GameState.IsDialogOpen = false;
+        Panel.SetActive(false);
+        if(NextHint != null)
+        {
+            NextHint.SetActive(false);
+        }
+        currentLines = null;
+        lineIndex = 0;
+
+    }
+
+    /// <summary>
+    /// 会話中の次への入力
+    /// </summary>
+    public void Next()
+    {
+        //パネルが有効じゃなかったら
+        if (!Panel.activeSelf)
+        {
+            return;
+        }
+        //文字送り中なら
+        if (isTyping)
+        {
+            //即表示
+            FinishCurrentLineInstant();
+            return;
+        }
+        lineIndex++; //インクリメント（n+1すること）
+
+        if(currentLines!=null &&
+            lineIndex < currentLines.Length)
+        {
+            ShowLine(lineIndex);
+        }
+        else
+        {
+            Close();
+        }
+    }
+    /// <summary>
+    ///index行目を表示する
+    /// </summary>
+    /// <param name="index"></param>
+    private void ShowLine(int index)
+    {
+        //今表示されているものを空にします
+        MessageText.text = string.Empty;
+
+        //▼の送り表示のオブジェクトがあれば表示します
+        if(NextHint != null)
+        {
+            NextHint.SetActive(true);
+        }
+        typingCoroutine = 
+            StartCoroutine(TypeLine(currentLines[index]));
+
+    }
+    /// <summary>
+    /// 文字送りを行う
+    /// </summary>
+    /// <param name="line"></param>
+    /// <returns></returns>
+    private IEnumerator TypeLine(string line)
+    {
+        isTyping = true;
+        //引数の行の中の一文字を取り出していく
+        foreach (char c in line)
+        {
+            MessageText.text += c;
+            yield return new WaitForSeconds(charInterval);
+        }
+        isTyping = false;
+        if(NextHint != null)
+        {
+            NextHint.SetActive(true);
+        }
+        //自動で次の行にいくように
+        Next();
+        typingCoroutine = null;
+    }
+
+    private void FinishCurrentLineInstant()
+    {
+        if(currentLines == null)
+        {
+            return;
+        }
+        //現在の行を全て表示
+        MessageText.text = currentLines[lineIndex];
+        //文字送り中じゃなくする
+        isTyping = false;
+
+        if(NextHint != null)
+        {
+            NextHint.SetActive(true);
+        }
+    }
+
+
+    public void OnYes()
+    {
+        Close();
+    }
+    public void OnNo()
+    {
+        Close();
+    }
+}
