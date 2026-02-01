@@ -4,6 +4,7 @@ using System.Collections;
 
 public class DialogUI : MonoBehaviour
 {
+    
     /// <summary>
     /// どこからでもアクセスできるようにStaticで宣言する
     /// </summary>
@@ -17,6 +18,12 @@ public class DialogUI : MonoBehaviour
 
     [Header("▼などのNextHint (optional)")]
     public GameObject NextHint;
+
+    /// <summary>
+    /// はい、いいえのボタンの変数
+    /// </summary>
+    public GameObject YesNoButtonBG;
+
 
     /// <summary>
     /// １文字を待つ時間
@@ -69,12 +76,18 @@ public class DialogUI : MonoBehaviour
             return;
         }
 
+        //boolの値を直接GameObjectのActiveの値に変更する
+        YesNoButtonBG.SetActive(dialogData.ShowYesNo);
+
 
         GameState.IsDialogOpen = true;
         NameText.text = dialogData.Speaker;
 
         currentLines = dialogData.MessageLines;
         lineIndex = 0;
+
+        
+
 
         Panel.SetActive(true);
         //現在の行を表示していく
@@ -86,12 +99,18 @@ public class DialogUI : MonoBehaviour
     /// </summary>
    public void Close()
     {
+        //まず文字送りを止めて
+        StopTypingIfNeeded();
+
         GameState.IsDialogOpen = false;
         Panel.SetActive(false);
         if(NextHint != null)
         {
             NextHint.SetActive(false);
         }
+
+        
+
         currentLines = null;
         lineIndex = 0;
 
@@ -132,6 +151,9 @@ public class DialogUI : MonoBehaviour
     /// <param name="index"></param>
     private void ShowLine(int index)
     {
+        //まず文字送りを止めて
+        StopTypingIfNeeded();
+
         //今表示されているものを空にします
         MessageText.text = string.Empty;
 
@@ -164,7 +186,7 @@ public class DialogUI : MonoBehaviour
             NextHint.SetActive(true);
         }
         //自動で次の行にいくように
-        Next();
+       //Next();
         typingCoroutine = null;
     }
 
@@ -174,6 +196,8 @@ public class DialogUI : MonoBehaviour
         {
             return;
         }
+        //まず文字送りを止めて
+        StopTypingIfNeeded();
         //現在の行を全て表示
         MessageText.text = currentLines[lineIndex];
         //文字送り中じゃなくする
@@ -185,6 +209,17 @@ public class DialogUI : MonoBehaviour
         }
     }
 
+    //必要だったら文字送りを止める
+    private void StopTypingIfNeeded()
+    {
+
+        if (typingCoroutine != null)
+        {
+            StopCoroutine(typingCoroutine);
+        }
+        isTyping = false;
+        
+    }
 
     public void OnYes()
     {

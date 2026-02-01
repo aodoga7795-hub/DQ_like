@@ -18,6 +18,8 @@ public class Interctor : MonoBehaviour
 
     public float EyeHeight = 0.5f;
 
+
+
     //PlayerInputのＥキーが押されたときに呼ばれます
     public void OnInteract(InputValue value)
     {
@@ -65,5 +67,20 @@ public class Interctor : MonoBehaviour
     void Update()
     {
         
+    }
+
+    //Dialogを進める
+    public void OnMessageNext(InputValue value)
+    {
+        if (!value.isPressed)
+        {
+            return;
+        }
+        //ダイアログが表示されていたら
+        if (GameState.IsDialogOpen)
+        {
+            //次の行に進めてもらう
+            DialogUI.Instance.Next();
+        }
     }
 }
