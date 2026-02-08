@@ -125,6 +125,33 @@ public class DialogUI : MonoBehaviour
         //現在の行を表示していく
         ShowLine(lineIndex);
     }
+
+    //実習
+    public void ShowSimpleMessage(string dialogMessage)
+    {
+        if (dialogMessage == string.Empty)
+        {
+            Debug.LogWarning("dialogMessageがないです");
+            return;
+        }
+
+        // YesNoボタンは表示しない
+        YesNoButtonBG.SetActive(false);
+
+        GameState.IsDialogOpen = true;
+
+        // 名前は表示しない
+        NameText.text = string.Empty;
+
+        // 1行だけのメッセージとして設定
+        currentLines = new string[1];
+        currentLines[0] = dialogMessage;
+        lineIndex = 0;
+
+        Panel.SetActive(true);
+        ShowLine(lineIndex);
+    }
+
     /// <summary>
     /// UIのCloseボタンから呼びます
     /// </summary>
@@ -139,8 +166,6 @@ public class DialogUI : MonoBehaviour
         {
             NextHint.SetActive(false);
         }
-
-        
 
         currentLines = null;
         lineIndex = 0;

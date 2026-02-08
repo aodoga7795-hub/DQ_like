@@ -6,6 +6,9 @@ public class NPCInteract : MonoBehaviour, IInteractable
     public DialogData FirstDialogData;
     public DialogData AfterDialogData;
 
+    //鍵を持っていた場合のダイアログのデータ
+    public DialogData HasKeyDialogData;
+
     /// <summary>
     /// UnityEventは処理をUnityEditorから設定できます
     /// </summary>
@@ -13,8 +16,12 @@ public class NPCInteract : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        //まだ村人に話しかけていない場合
-        if (!QuestFlag.TalkedToVillager)
+        //鍵を持って話しかけた場合
+        if (QuestFlag.HasKey)
+        {
+            DialogUI.Instance.Show(HasKeyDialogData);
+        }
+        else if (!QuestFlag.TalkedToVillager)
         {
             //ダイアログの表示を行う
             DialogUI.Instance.Show(FirstDialogData);
@@ -24,10 +31,17 @@ public class NPCInteract : MonoBehaviour, IInteractable
         {
             DialogUI.Instance.Show(AfterDialogData);
         }
+
        
+
+        //鍵を持っていなかったら、NPCEventは発生させない
+        if (!QuestFlag.HasKey)
+        {
+            return;
+        }
+
         //NPCEventが設定されていれば（Nullじゃなかったら）
         //設定された処理を発動する
-
         NPCEvent?.Invoke();
     }
 
