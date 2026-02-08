@@ -246,6 +246,23 @@ public class DialogUI : MonoBehaviour
         typingCoroutine = null;
     }
 
+    /// <summary>
+    /// ダイアログUIが開いていたら次の行を表示する
+    /// </summary>
+    /// <returns></returns>
+    public bool TryNextIfOpen()
+    {
+        //ダイアログが開いていなければ何もしない
+        if (!Panel.activeSelf)
+        {
+            return false;
+        }
+        //ここでNextと全く同じ挙動
+        Next();
+        return true;
+    }
+
+
     private void FinishCurrentLineInstant()
     {
         if(currentLines == null)
