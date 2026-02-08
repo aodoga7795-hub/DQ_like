@@ -6,4 +6,9 @@ public static class QuestFlag
     /// </summary>
     public static bool TalkedToVillager = false;
 
+    /// <summary>
+    /// •ó” A‚ðŠJ‚¯‚½‚©
+    /// </summary>
+    public static bool OpenedChestA = false;
+
 }
